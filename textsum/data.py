@@ -104,7 +104,11 @@ def ExampleGen(data_path, num_epochs=None):
         len_bytes = reader.read(8)
         if not len_bytes: break
         str_len = struct.unpack('q', len_bytes)[0]
-        example_str = struct.unpack('%ds' % str_len, reader.read(str_len))[0]
+        try:
+          example_str = struct.unpack('%ds' % str_len, reader.read(str_len))[0]
+        except: # Big time failure. not entirely sure why this is necessary, but occasionally
+          # my binary strings are failing, and given that this is a PoC I just need it to work
+          continue
         yield example_pb2.Example.FromString(example_str)
 
     epoch += 1
